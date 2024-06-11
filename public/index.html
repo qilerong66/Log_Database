@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Test Results</title>
+    <style>
+        #noResultsMessage {
+            font-size: 20px;
+            font-weight: bold;
+        }
+        .pass {
+            color: green;
+        }
+        .fail {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <h1>Product Test Results</h1>
+    <button onclick="clearData()">Clear Boards Data</button>
+    <input type="file" id="fileInput" accept=".xlsx">
+    <button onclick="uploadFile()">Upload the File~</button>
+    <select id="collectionSelect" onchange="fetchData(1)">
+        <option value="">Select Collection</option>
+    </select>
+    <p id="totalDocuments">Total documents(in selected build): 0</p>
+    <input type="text" id="searchInput" placeholder="Search...">
+    <button onclick="search()">Search(from any builds)</button>
+    <br><br>
+    <label for="passFailFilter">Pass or Fail:</label>
+    <select id="passFailFilter">
+        <option value="">Select</option>
+        <option value="Passed">Passed</option>
+        <option value="Failed">Failed</option>
+    </select>
+    <label for="startDateFilter">Start Date:</label>
+    <input type="date" id="startDateFilter">
+    <label for="endDateFilter">End Date:</label>
+    <input type="date" id="endDateFilter">
+    <button onclick="applyFilters()">Apply Filters(result is from selected build)</button>
+    <br><br>
+    <table id="resultsTable" border="1">
+        <tr>
+            <th>board_serial_number</th>
+            <th>test_time_and_date</th>
+            <th>Pass_or_Fail</th>
+            <th>failed_test</th>
+            <th>customer_FW_version</th>
+            <th>comment</th>
+        </tr>
+    </table>
+    <div id="pagination">
+        <button onclick="prevPage()">Previous</button>
+        <span id="pageInfo"></span>
+        <button onclick="nextPage()">Next</button>
+    </div>
+    <p id="noResultsMessage" style="display: none;">No more documents found.</p>
+    <p id="filteredResultsCount" style="font-weight: bold; display: none;"></p>
+    <script>
+        let currentPage = 1;
+        let totalPages = 1;
+        let totalFilteredDocuments = 0;
+
+        async function fetchCollections() {
+            try {
+                const response = await fetch('/collections');
+                const collections = await response.json();
+                const select = document.getElementById('collectionSelect');
+                collections.forEach(collection => {
+                    const option = document.createElement('option');
+                    option.value = collection;
+                    option.text = collection;
+                    select.add(option);
+                });
+            } catch (error) {
+                console.error('Error fetching collections:', error);
+            }
+        }
+
+        async function fetchData(page = 1) {
+            const collectionName = document.getElementById('collectionSelect').value;
+            const passFail = document.getElementById('passFailFilter').value;
+            const startDate = document.getElementById('startDateFilter').value;
+            const endDate = document.getElementById('endDateFilter').value;
+
+            if (!collectionName) {
+                return;
+            }
+            try {
+                const query = new URLSearchParams({ page, passFail, startDate, endDate }).toString();
+                const response = await fetch(`/collections/${collectionName}?${query}`);
+                const data = await response.json();
+                const table = document.getElementById('resultsTable');
+                const rows = table.getElementsByTagName('tr');
+                while (rows.length > 1) {
+                    table.deleteRow(1);
+                }
+                data.documents.forEach(test => {
+                    const row = table.insertRow();
+                    row.insertCell(0).innerText = test.board_serial_number;
+                    row.insertCell(1).innerText = test.test_time_and_date;
+
+                    const passOrFailCell = row.insertCell(2);
+                    if (typeof test.Pass_or_Fail === 'string') {
+                        const passOrFailValues = test.Pass_or_Fail.trim().split('\n');
+                        passOrFailCell.innerHTML = passOrFailValues.map(value => {
+                            value = value.trim();
+                            if (value === 'Passed') {
+                                return `<span class="pass">${value}</span>`;
+                            } else if (value === 'Failed') {
+                                return `<span class="fail">${value}</span>`;
+                            } else {
+                                return value;
+                            }
+                        }).join('<br>');
+                    } else {
+                        passOrFailCell.innerText = test.Pass_or_Fail;
+                    }
+
+                    row.insertCell(3).innerText = test.failed_test;
+                    row.insertCell(4).innerText = test.customer_FW_version;
+
+                    // 添加 comment 列
+                    const commentCell = row.insertCell(5);
+                    const commentInput = document.createElement('textarea');
+                    commentInput.value = test.comment || '';
+                    commentInput.rows = 3; // 设置textarea的行数
+                    commentInput.onchange = async () => {
+                        try {
+                            const response = await fetch(`/collections/${collectionName}/${test._id}/comment`, {
+                                method: 'PATCH',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify({ comment: commentInput.value })
+                            });
+
+                            if (!response.ok) {
+                                const errorData = await response.json();
+                                alert(`Error updating comment: ${errorData.error}`);
+                            }
+                        } catch (error) {
+                            console.error('Error updating comment:', error);
+                        }
+                    };
+                    commentCell.appendChild(commentInput);
+                });
+                currentPage = data.currentPage;
+                totalPages = data.totalPages;
+                document.getElementById('pageInfo').innerText = `Page ${currentPage} of ${totalPages}`;
+                document.getElementById('totalDocuments').innerText = `Total documents(in selected serial): ${data.totalDocuments}`;
+                document.getElementById('noResultsMessage').style.display = data.documents.length ? 'none' : 'block';
+                if (data.totalFilteredDocuments !== undefined) {
+                    totalFilteredDocuments = data.totalFilteredDocuments;
+                    document.getElementById('filteredResultsCount').innerText = `Filtered Results: ${totalFilteredDocuments} items found`;
+                    document.getElementById('filteredResultsCount').style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        }
+
+        async function uploadFile() {
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
+            if (!file) {
+                alert('Please select a file to upload');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const response = await fetch('/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (response.ok) {
+                    alert('File uploaded and data imported successfully');
+                    location.reload(); // Reload the page to refresh the data
+                } else {
+                    const errorData = await response.json();
+                    alert(`Error uploading file: ${errorData.error}`);
+                }
+            } catch (error) {
+                console.error('Error uploading file:', error);
+                alert('For some reason cannot upload file');
+            }
+        }
+
+        async function search() {
+            const searchTerm = document.getElementById('searchInput').value;
+            if (!searchTerm) {
+                alert('Please enter a search term');
+                return;
+            }
+
+            try {
+                const response = await fetch(`/search?q=${encodeURIComponent(searchTerm)}`);
+                const data = await response.json();
+                const table = document.getElementById('resultsTable');
+                const rows = table.getElementsByTagName('tr');
+                while (rows.length > 1) {
+                    table.deleteRow(1);
+                }
+
+                const noResultsMessage = document.getElementById('noResultsMessage');
+                if (data.length === 0) {
+                    noResultsMessage.style.display = 'block';
+                } else {
+                    noResultsMessage.style.display = 'none';
+                    data.forEach(test => {
+                        const row = table.insertRow();
+                        row.insertCell(0).innerText = test.board_serial_number;
+                        row.insertCell(1).innerText = test.test_time_and_date;
+
+                        const passOrFailCell = row.insertCell(2);
+                        if (typeof test.Pass_or_Fail === 'string') {
+                            const passOrFailValues = test.Pass_or_Fail.trim().split('\n');
+                            passOrFailCell.innerHTML = passOrFailValues.map(value => {
+                                value = value.trim();
+                                if (value === 'Passed') {
+                                    return `<span class="pass">${value}</span>`;
+                                } else if (value === 'Failed') {
+                                    return `<span class="fail">${value}</span>`;
+                                } else {
+                                    return value;
+                                }
+                            }).join('<br>');
+                        } else {
+                            passOrFailCell.innerText = test.Pass_or_Fail;
+                        }
+
+                        row.insertCell(3).innerText = test.failed_test;
+                        row.insertCell(4).innerText = test.customer_FW_version;
+                        row.insertCell(5).innerHTML = test.comment.replace(/\n/g, '<br>'); // 添加 comment 字段并支持换行
+                    });
+                }
+                document.getElementById('pageInfo').innerText = `Search Results: ${data.length} items found`;
+            } catch (error) {
+                console.error('Error performing search:', error);
+                document.getElementById('noResultsMessage').style.display = 'block';
+            }
+        }
+
+        function prevPage() {
+            if (currentPage > 1) {
+                fetchData(currentPage - 1);
+            }
+        }
+
+        function nextPage() {
+            if (currentPage < totalPages) {
+                fetchData(currentPage + 1);
+            }
+        }
+
+        async function applyFilters() {
+            currentPage = 1; // Reset to first page when applying filters
+            fetchData();
+        }
+
+        async function clearData() {
+            const collectionName = document.getElementById('collectionSelect').value;
+            if (!collectionName) {
+                alert('Please select a collection');
+                return;
+            }
+            try {
+                const response = await fetch(`/collections/${collectionName}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    alert('Collection deleted successfully');
+                    location.reload(); // Reload the page to refresh the data
+                } else {
+                    const errorData = await response.json();
+                    alert(`Error deleting collection: ${errorData.error}`);
+                }
+            } catch (error) {
+                console.error('Error deleting collection:', error);
+                alert('For some reason cannot delete the collection');
+            }
+        }
+
+        window.onload = fetchCollections;
+    </script>
+</body>
+</html>

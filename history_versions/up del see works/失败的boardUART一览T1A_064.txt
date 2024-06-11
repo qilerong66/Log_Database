@@ -1,0 +1,119 @@
+<aBCE>
+FL1 v4.5.0
+AbCDFHI
+FL2 v4.5.0
+[FL2] line=759
+BOOTMODE:  0x00
+BOOTSTRAP: 0x20
+[FL2] line=483 Serial Number: Q1AB4YA19CC117-0064
+K[FL2] line=808 [PERCFG] No PCIE Key, Using Default
+[FL2] line=819 [PERCFG] PCIE Gen4
+[FL2] line=831 PCIe link up
+[FL2] line=518 Model Number: QuadraT1A
+[FL2] line=585 [PERCFG] No DDRS Key, Using Default from Serial number config
+[FL2] line=626 [PERCFG] Target DDR speed - 4
+DDR:Auto-Err_UnknownPCB-Single-8Gb-4266-C
+[FL2] line=911 TOP DDR init pass
+[FL2] line=747 [PERCFG] DDR Per Bank Refresh
+[FL2] line=747 [PERCFG] DDR Per Bank Refresh
+[FL2] line=747 [PERCFG] DDR Per Bank Refresh
+[FL2] line=747 [PERCFG] DDR Per Bank Refresh
+[FL2] line=926 DDR init succeed
+[FL2] line=943 DDR Quick BIST 49 ms
+[FL2] line=947 PASS DDR Quick BIST
+[FL2] line=959 DDR Full BIST 1 s
+[FL2] line=963 PASS DDR Full BIST
+[FL2] line=1346 [PERCFG] Warning: persistent config ignored due to version
+[FL2] line=1353 Virtual Persistent Config
+[FL2] line=1354 @@@@@@@@@@@@@@@@@@@@@@@@@
+[FL2] line=1358 GEN4    0001
+[FL2] line=1358 QLPM    0000
+[FL2] line=1358 SRIV    0001
+[FL2] line=1358  SRV    0001
+[FL2] line=1358 LVDA    0000
+[FL2] line=1358 LCAI    0001
+[FL2] line=1358 PCIP    03F0
+[FL2] line=1358 EAER    0000
+[FL2] line=1358 PCVR    0004
+[FL2] line=1358 DPBR    0001
+[FL2] line=1358 EQRD    0001
+[FL2] line=1358 QCVC    0384
+[FL2] line=1358 AIEN    0001
+[FL2] line=1358 2DEN    0001
+[FL2] line=1358 DCEN    0001
+[FL2] line=1358 CONF    000D
+[FL2] line=1358 DDRS    0000
+[FL2] line=1358 SHMM    0000
+[FL2] line=1358 DP2P    0000
+[FL2] line=1360 @@@@@@@@@@@@@@@@@@@@@@@@@
+[FL2] line=1034 Nor version: 0x3
+[FL2] line=986 Nor flash control table:
+[FL2] line=987 Nor flash version: 0x3
+[FL2] line=988 Firmwareloader2 address: 0x20000
+[FL2] line=989 Firmwareloader2 safe address: 0xa0000
+[FL2] line=990 Active Fw slot info address: 0x3000
+[FL2] line=991 Fw slot1 address: 0x100000
+[FL2] line=992 Fw slot2 address: 0x800000
+[FL2] line=993 Fw slot3 address: 0x0
+[FL2] line=994 Fw usm address: 0x1500000
+[FL2] line=1073 Active fw slot: 1
+[FL2] line=1110 Read NVMe header from NOR 0x00100000 to 0x201ffe40
+[FL2] line=1131 NVMe header signature match
+[FL2] line=1134 NVMe revision: 4827esf2
+[FL2] line=1135 NVMe build time: 2024-05-15.16:33:27
+[FL2] line=1140 Copy NVMe FW from NOR 0x00100080 to 0xd6000000
+[FL2] line=1380 NVMe image de-compressed to address 0xd8000000
+[FL2] line=1261 Convert hex2bin finished and NVMe memories loaded
+[FL2] line=1295 NVMe vector table copied to vecbase
+[NVMe] 1613 NVMe HW Init...
+[NVMe] 1115 SERIAL NUMBER: Q1AB4YA19CC117-0064
+[NVMe] 1070 g_ui32DdrGpioConfig = 2
+[NVMe] 1072 g_ui32QuadraPowerMode = 0
+[NVMe] 1127 MODEL NUMBER: QuadraT1A
+[NVMe] 1130 LAST RAN FL2: v4.5.0
+[NVMe] 1134 FW VERSION: 4827esf2
+[NVMe] 1139 COALESCE_HMD_XCODER defined.
+[FL2] line=108 [PERCFG] No 2DEN Key, Using Default
+[FL2] line=119 [PERCFG] 2D Block Enabled
+[FL2] line=137 [PERCFG] No DCEN Key, Using Default
+[FL2] line=148 [PERCFG] DEC Block Enabled
+[FL2] line=167 [PERCFG] No AIEN Key, Using Default
+[FL2] line=177 [PERCFG] AI Block Enabled
+[NVMe] 1644 g_np2dp = 1
+[NVMe] 1656 g_np2fp = 3
+[FL2] line=217 [PERCFG] No QCVC Key, Using QLPM to control Core voltage
+[FL2] line=251 [PERCFG] Target Core Voltage - 900 mV
+[NVMe] 109 Nor version: 0x3
+[NVMe] 148 Active fw slot: 1
+[NVMe] 360 Read other cores FW image...
+[NVMe] 378 Other cores image size 2965855 copied
+[NVMe] 383 AUTH other cores!
+[NVMe] 399 Other cores image signature copied
+[NVMe] 409 Other cores image was authenticated
+[NVMe] 429 Other cores image de-compressing...
+[NVMe] 510 Core 1 is with fw loaded
+[NVMe] 510 Core 2 is with fw loaded
+[NVMe] 510 Core 3 is with fw loaded
+[NVMe] 510 Core 4 is with fw loaded
+[NVMe] 1035 PLL Freq: CPU 850 DDR0 1066 DDR1 1066 SYS 630
+[NVMe] 1040 PLL Freq: BLKSYS 630 AUD 666 VID 750 AI 1000
+[NVMe] 1045 PLL Swch: AUD 0 ENC 2 DEC 0 2D 0
+[NVMe] 5829 Cache attribute is 0x11111112
+[NVMe] 1569 Unstall CORE 1
+[NVMe] 1569 Unstall CORE 2
+[NVMe] 1569 Unstall CORE 3
+[NVMe] 1569 Unstall CORE 4
+[NVMe] 1574 VIDEO_PLL_CTRL 0x2000034 = 0xc0006b42
+[NVMe] 1576 DDR0_PLL_CTRL 0x200000C = 0xc0006801
+[NVMe] 1578 DDR1_PLL_CTRL 0x2000014 = 0xc0006801
+[NVMe] 1585 Cores 0x4123 unstalled
+[NVMe] 1953 Init command ctrl block
+[NVMe] 1970 Init dma usage table
+[NVMe] 700 PF Initial Reset...
+[NVMe] 355 PF Controller Reset Processed
+[NVMe] 109 Nor version: 0x3
+[NVMe] 228 Got ctrl table
+[NVMe] 148 Active fw slot: 1
+[NVMe] 321 PF CSTS.RDY = 0
+[NVMe] 460 Warm Upgrade Inactive
+D6[NVMe] 1984 Waiting for CC.EN = 1...

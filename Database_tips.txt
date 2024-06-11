@@ -1,0 +1,16 @@
+1, make sure to create a folder called "uploads", in the same folder as "public", "app" and "importData", otherwise uploads will fail
+
+2, √ in excel cript, tell user to write the name of the excel to be "C####_Q#X", # is number, X is capital letter.
+
+3, add a function: if documents that wanna load is exactly the same as those in collection, do not load and notice user "duplicate load, not executed"
+
+4, √ change the excel script write "Not shown" instead of "None" if the customer FW version is not shown
+
+5, if searched serial number is less than "Q1A328A11CC109-0433" this amount of characters, may have many search result, not 0. e.g. search for just Q, will find all the boards
+
+6, search actually can search based on Pass or Fail, serial number, Failed test, FW version, time, but recommend just search by serial number
+
+7, page目前只是显示某个选中的collection有多少页document，现在得让用户使用了filter或者search后，page也随着搜到的结果的数量而变动
+
+
+

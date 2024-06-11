@@ -1,0 +1,152 @@
+const express = require('express');
+const bodyParser = require('body-parser');
+const mongoose = require('mongoose');
+const multer = require('multer');
+const xlsx = require('xlsx');
+const path = require('path');
+const fs = require('fs');
+
+mongoose.connect('mongodb://localhost:27017/productTests', { useNewUrlParser: true, useUnifiedTopology: true });
+
+const testSchema = new mongoose.Schema({
+    board_serial_number: String,
+    test_time_and_date: String,
+    Pass_or_Fail: String,
+    failed_test: String,
+    customer_FW_version: String
+});
+
+const Test = mongoose.model('Test', testSchema);
+
+const app = express();
+
+app.use(bodyParser.json());
+app.use(express.static('public'));
+
+const uploadDir = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir);
+}
+
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, 'uploads/');
+    },
+    filename: function (req, file, cb) {
+        cb(null, file.originalname);
+    }
+});
+const upload = multer({ storage: storage });
+
+app.get('/collections', async (req, res) => {
+    try {
+        const collections = await mongoose.connection.db.listCollections().toArray();
+        res.status(200).json(collections.map(col => col.name));
+    } catch (err) {
+        res.status(500).json({ error: 'Could not fetch collections' });
+    }
+});
+
+// app.get('/collections', async (req, res) => {
+//     try {
+//         let collections = await mongoose.connection.db.listCollections().toArray();
+//         collections = collections.map(col => {
+//             const [part1, part2] = col.name.split('_');
+//             return `${part2}_${part1}`;
+//         }).sort();
+
+//         res.status(200).json(collections);
+//     } catch (err) {
+//         res.status(500).json({ error: 'Could not fetch collections' });
+//     }
+// });
+
+// app.get('/collections', async (req, res) => {
+//     try {
+//         let collections = await mongoose.connection.db.listCollections().toArray();
+//         collections = collections.map(col => {
+//             const [part1, part2] = col.name.split('_');
+//             return { original: col.name, transformed: `${part2}_${part1}` };
+//         });
+
+//         // 按照 transformed 部分的开头 'C某某' 进行排序
+//         collections.sort((a, b) => {
+//             const aCPart = a.transformed.split('_')[0];
+//             const bCPart = b.transformed.split('_')[0];
+//             return aCPart.localeCompare(bCPart);
+//         });
+
+//         res.status(200).json(collections);
+//     } catch (err) {
+//         res.status(500).json({ error: 'Could not fetch collections' });
+//     }
+// });
+
+
+
+app.get('/collections/:name', async (req, res) => {
+    const collectionName = req.params.name;
+    const page = parseInt(req.query.page) || 1; // 获取页码，默认为第1页
+    const limit = 40; // 每页显示40条数据
+    const skip = (page - 1) * limit; // 计算跳过的数据条数
+
+    try {
+        const DynamicModel = mongoose.model(collectionName, testSchema, collectionName);
+        const totalDocuments = await DynamicModel.countDocuments(); // 获取总文档数
+        const documents = await DynamicModel.find().skip(skip).limit(limit); // 获取分页数据
+
+        res.status(200).json({
+            totalDocuments,
+            documents,
+            totalPages: Math.ceil(totalDocuments / limit),
+            currentPage: page
+        });
+    } catch (err) {
+        res.status(500).json({ error: 'Could not fetch the documents' });
+    }
+});
+
+app.delete('/collections/:name', async (req, res) => {
+    const collectionName = req.params.name;
+    try {
+        const DynamicModel = mongoose.model(collectionName, testSchema, collectionName);
+        await DynamicModel.deleteMany({});
+        res.status(200).send('Data cleared successfully');
+    } catch (err) {
+        res.status(500).json({ error: 'Could not clear the data' });
+    }
+});
+
+app.post('/upload', upload.single('file'), async (req, res) => {
+    if (!req.file) {
+        return res.status(400).json({ error: 'No file uploaded' });
+    }
+
+    const filePath = req.file.path;
+
+    try {
+        const workbook = xlsx.readFile(filePath);
+        const sheet_name_list = workbook.SheetNames;
+        const xlData = xlsx.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
+
+        const processedData = xlData.map(item => {
+            if (item.customer_FW_version == "" || length(item.customer_FW_version) < 7) {
+                item.customer_FW_version = "None";
+            }
+            return item;
+        });
+
+        const collectionName = path.basename(req.file.originalname, path.extname(req.file.originalname));
+        const DynamicModel = mongoose.model(collectionName, testSchema, collectionName);
+
+        await DynamicModel.insertMany(processedData);
+        res.status(200).send('Data imported successfully');
+    } catch (err) {
+        res.status(500).json({ error: 'Could not import the data' });
+    }
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+});

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Test Results</title>
+</head>
+<body>
+    <h1>Product Test Results</h1>
+    <button onclick="clearData()">Clear Boards Data</button>
+    <input type="file" id="fileInput" accept=".xlsx">
+    <button onclick="uploadFile()">Upload Excel File</button>
+    <table id="resultsTable" border="1">
+        <tr>
+            <th>board_serial_number</th>
+            <th>test_time_and_date</th>
+            <th>Pass_or_Fail</th>
+            <th>failed_test</th>
+            <th>customer_FW_version</th>
+        </tr>
+    </table>
+    <script>
+        async function fetchData() {
+            try {
+                const response = await fetch('/tests');
+                const data = await response.json();
+                const table = document.getElementById('resultsTable');
+                data.forEach(test => {
+                    const row = table.insertRow();
+                    row.insertCell(0).innerText = test.board_serial_number;
+                    row.insertCell(1).innerText = new Date(test.test_time_and_date).toLocaleDateString();
+                    row.insertCell(2).innerText = test.Pass_or_Fail;
+                    row.insertCell(3).innerText = test.failed_test;
+                    row.insertCell(4).innerText = test.customer_FW_version;
+                });
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        }
+
+        async function clearData() {
+            try {
+                const response = await fetch('/tests', {
+                    method: 'DELETE'
+                });
+                if (response.ok) {
+                    alert('Data cleared successfully');
+                    location.reload();  // Reload the page to refresh the data
+                } else {
+                    const errorData = await response.json();
+                    alert(`Error clearing data: ${errorData.error}`);
+                }
+            } catch (error) {
+                console.error('Error clearing data:', error);
+                alert('For some reason cannot clear data');
+            }
+        }
+
+        async function uploadFile() {
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
+
+            if (!file) {
+                alert('Please select an Excel file');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const response = await fetch('/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (response.ok) {
+                    alert('File uploaded and data imported successfully');
+                    location.reload();  // Reload the page to refresh the data
+                } else {
+                    const errorData = await response.json();
+                    alert(`Error uploading file: ${errorData.error}`);
+                }
+            } catch (error) {
+                console.error('Error uploading file:', error);
+                alert('For some reason cannot upload file');
+            }
+        }
+
+        window.onload = fetchData;
+    </script>
+</body>
+</html>
