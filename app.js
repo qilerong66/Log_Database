@@ -6,9 +6,11 @@ const xlsx = require('xlsx');
 const path = require('path');
 const fs = require('fs');
 
-mongoose.connect('mongodb://localhost:27017/productTests', { useNewUrlParser: true, useUnifiedTopology: true });
+//mongoose.connect('mongodb://localhost:27017/productTests', { useNewUrlParser: true, useUnifiedTopology: true });
 //mongoose.connect('https://prod.netint.ca/admin/', { useNewUrlParser: true, useUnifiedTopology: true });
-//mongoose.connect('mongodb+srv://lerongqi:!@654321rL@cluster0.zanzara.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0');
+const encodedPassword = encodeURIComponent('!@369588');
+console.log(encodedPassword); 
+mongoose.connect('mongodb+srv://lerong_Qi:!%40369588@cluster0.zanzara.mongodb.net/productTests');//this is where we can set to connect to different database
 
 const testSchema = new mongoose.Schema({
     board_serial_number: String,
@@ -193,6 +195,8 @@ app.patch('/collections/:collectionName/:id/comment', async (req, res) => {
         res.status(500).json({ error: 'Could not update the comment' });
     }
 });
+
+process.env.PORT = 
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
