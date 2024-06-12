@@ -15,22 +15,6 @@
         let totalPages = 1;
         let totalFilteredDocuments = 0;
 
-        async function fetchCollections() {
-            try {
-                const response = await fetch('/collections');
-                const collections = await response.json();
-                const select = document.getElementById('collectionSelect');
-                collections.forEach(collection => {
-                    const option = document.createElement('option');
-                    option.value = collection;
-                    option.text = collection;
-                    select.add(option);
-                });
-            } catch (error) {
-                console.error('Error fetching collections:', error);
-            }
-        }
-
         function adminMode() {
             const password = prompt("Please enter the password:");
             if (password === "logan") {
@@ -38,6 +22,10 @@
             } else {
                 alert("Incorrect password. Please try again.");
             }
+        }
+
+        function visitorMode() {
+        window.location.href = "/public/visitor.html";
         }
 
         window.onload = fetchCollections;
