@@ -10,7 +10,7 @@ const fs = require('fs');
 //mongoose.connect('https://prod.netint.ca/admin/', { useNewUrlParser: true, useUnifiedTopology: true });
 const encodedPassword = encodeURIComponent('!@369588');
 console.log(encodedPassword); 
-mongoose.connect('mongodb+srv://lerong_Qi:!%40369588@cluster0.zanzara.mongodb.net/productTests');//this is where we can set to connect to different database
+mongoose.connect('mongodb+srv://lerong_Qi:!%40369588@cluster0.zanzara.mongodb.net/productTests', { useNewUrlParser: true, useUnifiedTopology: true });//this is where we can set to connect to different database
 
 const testSchema = new mongoose.Schema({
     board_serial_number: String,
@@ -26,7 +26,10 @@ const Test = mongoose.model('Test', testSchema);
 const app = express();
 
 app.use(bodyParser.json());
-app.use(express.static('public'));
+//app.use(express.static('public'));
+
+// Serve static files from the 'public' directory
+app.use(express.static(path.join(__dirname, 'public')));
 
 const uploadDir = path.join(__dirname, 'uploads');
 if (!fs.existsSync(uploadDir)) {

@@ -63,22 +63,6 @@
         let totalPages = 1;
         let totalFilteredDocuments = 0;
 
-        // async function fetchCollections() {
-        //     try {
-        //         const response = await fetch('/collections');
-        //         const collections = await response.json();
-        //         const select = document.getElementById('collectionSelect');
-        //         collections.forEach(collection => {
-        //             const option = document.createElement('option');
-        //             option.value = collection;
-        //             option.text = collection;
-        //             select.add(option);
-        //         });
-        //     } catch (error) {
-        //         console.error('Error fetching collections:', error);
-        //     }
-        // }
-
         async function fetchData(page = 1) {
             const collectionName = document.getElementById('collectionSelect').value;
             const passFail = document.getElementById('passFailFilter').value;
@@ -287,6 +271,17 @@
                 alert('For some reason cannot delete the collection');
             }
         }
+
+        // // Replace 'collectionName' with the actual name of your collection
+        // const collectionName = 'collectionName';
+
+        // fetch(`/collections/${collectionName}`)
+        // .then(response => response.json())
+        // .then(data => {
+        //     // Use the data here
+        //     console.log(data);
+        // })
+        // .catch(error => console.error('Error:', error));
 
         window.onload = fetchCollections;
     </script>
