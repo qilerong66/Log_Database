@@ -6,7 +6,7 @@
     <title>Welcome to manufacturing test log Database!</title>
 </head>
 <body>
-    <h1>>Welcome to manufacturing test log Database!</h1>
+    <h1>Welcome to manufacturing test log Database!</h1>
     <button onclick="visitorMode()">Visitor's entrance</button>
     <input type="file" id="fileInput" accept=".xlsx">
     <button onclick="adminMode()">Admin's entrance</button>
@@ -28,6 +28,15 @@
                 });
             } catch (error) {
                 console.error('Error fetching collections:', error);
+            }
+        }
+
+        function adminMode() {
+            const password = prompt("Please enter the password:");
+            if (password === "logan") {
+                window.location.href = "/public/index.html";
+            } else {
+                alert("Incorrect password. Please try again.");
             }
         }
 
