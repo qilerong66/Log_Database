@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Product Test Results</title>
+    <script src="app.js"></script>
     <style>
         #noResultsMessage {
             font-size: 20px;
@@ -272,16 +273,16 @@
             }
         }
 
-        // Replace 'collectionName' with the actual name of your collection
-        const collectionName = 'Q1A_C087';
+        // // Replace 'collectionName' with the actual name of your collection
+        // const collectionName = 'Q1A_C087';
 
-        fetch(`/collections/${collectionName}`)
-        .then(response => response.json())
-        .then(data => {
-            // Use the data here
-            console.log(data);
-        })
-        .catch(error => console.error('Error:', error));
+        // fetch(`/collections/${collectionName}`)
+        // .then(response => response.json())
+        // .then(data => {
+        //     // Use the data here
+        //     console.log(data);
+        // })
+        // .catch(error => console.error('Error:', error));
 
         window.onload = fetchCollections;
     </script>

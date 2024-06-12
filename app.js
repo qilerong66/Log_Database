@@ -7,7 +7,6 @@ const path = require('path');
 const fs = require('fs');
 
 //mongoose.connect('mongodb://localhost:27017/productTests', { useNewUrlParser: true, useUnifiedTopology: true });
-//mongoose.connect('https://prod.netint.ca/admin/', { useNewUrlParser: true, useUnifiedTopology: true });
 const encodedPassword = encodeURIComponent('!@369588');
 console.log(encodedPassword); 
 mongoose.connect('mongodb+srv://lerong_Qi:!%40369588@cluster0.zanzara.mongodb.net/productTests', { useNewUrlParser: true, useUnifiedTopology: true });//this is where we can set to connect to different database
@@ -28,8 +27,13 @@ const app = express();
 app.use(bodyParser.json());
 //app.use(express.static('public'));
 
-// Serve static files from the 'public' directory
+// Serve static files from the 'public' directory, 即提供静态文件服务
 app.use(express.static(path.join(__dirname, 'public')));
+
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+    res.sendFile(path.join(__dirname, 'public', 'visitor.html'));
+});
 
 const uploadDir = path.join(__dirname, 'uploads');
 if (!fs.existsSync(uploadDir)) {
