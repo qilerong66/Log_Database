@@ -272,16 +272,16 @@
             }
         }
 
-        // // Replace 'collectionName' with the actual name of your collection
-        // const collectionName = 'collectionName';
+        // Replace 'collectionName' with the actual name of your collection
+        const collectionName = 'Q1A_C087';
 
-        // fetch(`/collections/${collectionName}`)
-        // .then(response => response.json())
-        // .then(data => {
-        //     // Use the data here
-        //     console.log(data);
-        // })
-        // .catch(error => console.error('Error:', error));
+        fetch(`/collections/${collectionName}`)
+        .then(response => response.json())
+        .then(data => {
+            // Use the data here
+            console.log(data);
+        })
+        .catch(error => console.error('Error:', error));
 
         window.onload = fetchCollections;
     </script>
